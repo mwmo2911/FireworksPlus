@@ -1,0 +1,120 @@
+limits:
+  max_duration_seconds: 60
+  max_fireworks_total: 250
+  min_interval_ticks: 4
+
+runtime:
+  cooldown_seconds: 15
+  allow_simultaneous_shows: false
+  cancel_previous_show: true
+
+update_checker:
+  enabled: false
+  resource_id: 0
+  cache_minutes: 60
+  notify_permission: "fireworksplus.admin.update"
+
+scheduling:
+  enabled: true
+  poll_seconds: 20
+  datetime_format: "yyyy-MM-dd HH:mm"
+
+main_gui:
+  title: "&cFireworksPlus"
+  size: 27
+  shows_slot: 12
+  builder_slot: 14
+  reload_slot: 22
+  schedules_slot: 4
+
+  gui:
+    schedules:
+      title: "&bSchedules"
+      size: 27
+      back_slot: 26
+
+sounds:
+  enabled: true
+  mute_vanilla_fireworks: true
+  start: "UI_TOAST_CHALLENGE_COMPLETE"
+  each_firework: ""
+  end: "ENTITY_PLAYER_LEVELUP"
+  volume: 1.0
+  pitch: 1.0
+
+particles:
+  trail_type: "FIREWORKS_SPARK"
+  options:
+    - "FIREWORKS_SPARK"
+    - "END_ROD"
+    - "VILLAGER_HAPPY"
+    - "CRIT"
+    - "CLOUD"
+    - "ENCHANT"
+    - "DRIP_WATER"
+    - "DRIP_LAVA"
+    - "HEART"
+  point_marker: "END_ROD"
+
+shows:
+  Celebration:
+    display: "&eCelebration"
+    slot: 10
+    fireworks: 30
+    interval_ticks: 6
+    radius: 1.6
+    power_min: 1
+    power_max: 2
+    palette: ["#FF3B30","#FFD60A","#34C759","#0A84FF","#FFFFFF"]
+    particles: ["FIREWORKS_SPARK", "VILLAGER_HAPPY"]
+
+  Royal:
+    display: "&dRoyal"
+    slot: 12
+    fireworks: 35
+    interval_ticks: 6
+    radius: 1.8
+    power_min: 1
+    power_max: 2
+    palette: ["#BF5AF2","#FFD60A","#0A84FF","#FFFFFF"]
+    particles: ["END_ROD"]
+
+  Chaos:
+    display: "&cChaos"
+    slot: 14
+    fireworks: 45
+    interval_ticks: 4
+    radius: 2.2
+    power_min: 1
+    power_max: 3
+    palette: ["#FF2D55","#FF9F0A","#30D158","#64D2FF","#BF5AF2"]
+
+  Neon:
+    display: "&bNeon"
+    slot: 16
+    fireworks: 35
+    interval_ticks: 5
+    radius: 1.7
+    power_min: 1
+    power_max: 2
+    palette: ["#30D158","#64D2FF","#0A84FF","#FF2D55"]
+
+  Emerald:
+    display: "&aEmerald"
+    slot: 19
+    fireworks: 30
+    interval_ticks: 6
+    radius: 1.5
+    power_min: 1
+    power_max: 2
+    palette: ["#00C853","#1DE9B6","#00E676","#A7FFEB","#FFFFFF"]
+
+  Sunset:
+    display: "&6Sunset"
+    slot: 21
+    fireworks: 35
+    interval_ticks: 6
+    radius: 1.8
+    power_min: 1
+    power_max: 2
+    palette: ["#FF3B30","#FF9F0A","#FFD60A","#FF2D55","#BF5AF2"]

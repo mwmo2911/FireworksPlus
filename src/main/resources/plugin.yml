@@ -1,0 +1,38 @@
+name: FireworksPlus
+version: 1.1
+main: com.fireworksplus.plugin.FireworksPlus
+api-version: "1.13"
+
+commands:
+  fw:
+    description: FireworksPlus main command
+    usage: /fw
+
+permissions:
+  fireworksplus.use:
+    description: Allows using the plugin
+    default: op
+
+  fireworksplus.builder:
+    description: Allows access to the show builder GUI
+    default: op
+
+  fireworksplus.admin.schedule:
+    description: Allows scheduling and listing schedules
+    default: op
+
+  fireworksplus.admin.delete:
+    description: Allows deleting custom shows
+    default: op
+
+  fireworksplus.admin.reload:
+    description: Allows reloading config and data files
+    default: op
+
+  fireworksplus.admin.update:
+    description: Receives update notifications
+    default: op
+
+  fireworksplus.*:
+    description: Grants all FireworksPlus permissions
+    default: op
