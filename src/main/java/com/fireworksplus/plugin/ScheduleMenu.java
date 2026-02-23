@@ -22,12 +22,14 @@ public class ScheduleMenu implements Listener {
 
     private final JavaPlugin plugin;
     private final ScheduleManager scheduleManager;
+    private final I18n i18n;
     private MainMenu mainMenu;
     private final NamespacedKey keyScheduleId;
 
     public ScheduleMenu(JavaPlugin plugin, ScheduleManager scheduleManager) {
         this.plugin = plugin;
         this.scheduleManager = scheduleManager;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
         this.keyScheduleId = new NamespacedKey(plugin, "schedule_id");
     }
 
@@ -37,25 +39,25 @@ public class ScheduleMenu implements Listener {
 
     public void open(Player p) {
         if (!hasPermission(p, "fireworksplus.admin.schedule")) {
-            p.sendMessage(ChatColor.RED + "No permission.");
+            p.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
             return;
         }
-        String title = color(plugin.getConfig().getString("gui.schedules.title", "&bSchedules"));
+        String title = color(plugin.getConfig().getString("gui.schedules.title", i18n.tr("gui.schedules.title", "&bSchedules")));
         int size = clampSize(plugin.getConfig().getInt("gui.schedules.size", 27));
 
         Inventory inv = Bukkit.createInventory(p, size, title);
         int backSlot = plugin.getConfig().getInt("gui.schedules.back_slot", 26);
 
         if (backSlot >= 0 && backSlot < inv.getSize()) {
-            inv.setItem(backSlot, button(Material.ARROW, ChatColor.AQUA + "Back",
-                    List.of(ChatColor.GRAY + "Return to main menu")));
+            inv.setItem(backSlot, button(Material.ARROW, ChatColor.AQUA + i18n.tr("gui.common.back", "Back"),
+                    List.of(ChatColor.GRAY + i18n.tr("gui.common.back_lore", "Return to main menu"))));
         }
 
         List<String> entries = scheduleManager.listSchedulesPretty();
         if (entries.isEmpty()) {
             int center = Math.min(inv.getSize() - 1, inv.getSize() / 2);
-            inv.setItem(center, button(Material.BARRIER, ChatColor.RED + "No schedules",
-                    List.of(ChatColor.GRAY + "No scheduled shows")));
+            inv.setItem(center, button(Material.BARRIER, ChatColor.RED + i18n.tr("gui.schedules.none", "No schedules"),
+                    List.of(ChatColor.GRAY + i18n.tr("gui.schedules.none_lore", "No scheduled shows"))));
             p.openInventory(inv);
             return;
         }
@@ -75,7 +77,7 @@ public class ScheduleMenu implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
 
-        String title = color(plugin.getConfig().getString("gui.schedules.title", "&bSchedules"));
+        String title = color(plugin.getConfig().getString("gui.schedules.title", i18n.tr("gui.schedules.title", "&bSchedules")));
         if (!e.getView().getTitle().equals(title)) return;
 
         e.setCancelled(true);
@@ -96,16 +98,16 @@ public class ScheduleMenu implements Listener {
         if (scheduleId == null || scheduleId.isBlank()) return;
 
         if (!hasPermission(p, "fireworksplus.admin.schedule")) {
-            p.sendMessage(ChatColor.RED + "No permission.");
+            p.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
             return;
         }
 
         boolean removed = scheduleManager.removeSchedule(scheduleId);
         if (removed) {
-            p.sendMessage(ChatColor.GREEN + "Schedule removed: " + ChatColor.WHITE + scheduleId);
+            p.sendMessage(ChatColor.GREEN + i18n.tr("msg.schedule_removed", "Schedule removed:") + " " + ChatColor.WHITE + scheduleId);
             open(p);
         } else {
-            p.sendMessage(ChatColor.RED + "Schedule not found: " + ChatColor.WHITE + scheduleId);
+            p.sendMessage(ChatColor.RED + i18n.tr("msg.schedule_not_found", "Schedule not found:") + " " + ChatColor.WHITE + scheduleId);
         }
     }
 
@@ -117,7 +119,7 @@ public class ScheduleMenu implements Listener {
         String plain = ChatColor.stripColor(entry);
         String[] parts = plain.split("\\s*\\|\\s*");
 
-        String header = parts.length > 0 ? parts[0].trim() : "Schedule";
+        String header = parts.length > 0 ? parts[0].trim() : i18n.tr("gui.schedules.schedule", "Schedule");
         String scheduleId = extractScheduleId(header);
         boolean done = header.contains("[DONE]");
         ChatColor statusColor = done ? ChatColor.RED : ChatColor.GREEN;
@@ -127,11 +129,11 @@ public class ScheduleMenu implements Listener {
         String location = parts.length > 3 ? parts[3].trim() : "";
 
         List<String> lore = new ArrayList<>();
-        if (!when.isBlank()) lore.add(ChatColor.GRAY + "When: " + ChatColor.WHITE + when);
-        if (!show.isBlank()) lore.add(ChatColor.GRAY + "Show: " + ChatColor.WHITE + show);
-        if (!location.isBlank()) lore.add(ChatColor.GRAY + "At: " + ChatColor.WHITE + location);
+        if (!when.isBlank()) lore.add(ChatColor.GRAY + i18n.tr("gui.schedules.when", "When:") + " " + ChatColor.WHITE + when);
+        if (!show.isBlank()) lore.add(ChatColor.GRAY + i18n.tr("gui.schedules.show", "Show:") + " " + ChatColor.WHITE + show);
+        if (!location.isBlank()) lore.add(ChatColor.GRAY + i18n.tr("gui.schedules.at", "At:") + " " + ChatColor.WHITE + location);
 
-        lore.add(ChatColor.DARK_GRAY + "Click to remove");
+        lore.add(ChatColor.DARK_GRAY + i18n.tr("gui.schedules.click_remove", "Click to remove"));
 
         ItemStack item = button(Material.PAPER, statusColor + header, lore);
         ItemMeta meta = item.getItemMeta();

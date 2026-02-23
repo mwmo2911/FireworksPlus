@@ -19,22 +19,25 @@ import java.util.List;
 
 public class BuilderTypesMenu implements Listener {
 
-    private static final String TITLE = ChatColor.DARK_AQUA + "" + "Type Editor";
+    private static final String TITLE_BASE = ChatColor.DARK_AQUA + "%s";
 
     private final JavaPlugin plugin;
     private final BuilderManager builderManager;
     private final BuilderMenu builderMenu;
+    private final I18n i18n;
 
     public BuilderTypesMenu(JavaPlugin plugin, BuilderManager builderManager, BuilderMenu builderMenu) {
         this.plugin = plugin;
         this.builderManager = builderManager;
         this.builderMenu = builderMenu;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
     }
 
     public void open(Player p) {
         BuilderSession s = builderManager.getOrCreate(p);
 
-        Inventory inv = Bukkit.createInventory(p, 27, TITLE);
+        String title = String.format(TITLE_BASE, i18n.tr("gui.types.title", "Type Editor"));
+        Inventory inv = Bukkit.createInventory(p, 27, title);
 
         typeButton(inv, 11, FireworkEffect.Type.BALL, s);
         typeButton(inv, 12, FireworkEffect.Type.BALL_LARGE, s);
@@ -42,28 +45,28 @@ public class BuilderTypesMenu implements Listener {
         typeButton(inv, 14, FireworkEffect.Type.BURST, s);
         typeButton(inv, 15, FireworkEffect.Type.CREEPER, s);
 
-        inv.setItem(22, button(Material.BOOK, ChatColor.AQUA + "Current Types",
+        inv.setItem(22, button(Material.BOOK, ChatColor.AQUA + i18n.tr("gui.types.current", "Current Types"),
                 List.of(
-                        ChatColor.GRAY + "Selected: " + ChatColor.WHITE + s.fireworkTypes.size(),
-                        ChatColor.DARK_GRAY + "Click adds, Shift-click removes"
+                        ChatColor.GRAY + i18n.tr("gui.types.selected", "Selected:") + " " + ChatColor.WHITE + s.fireworkTypes.size(),
+                        ChatColor.DARK_GRAY + i18n.tr("gui.types.click_hint", "Click adds, Shift-click removes")
                 )));
 
-        inv.setItem(26, button(Material.ARROW, ChatColor.AQUA + "Back",
-                List.of(ChatColor.GRAY + "Return to builder")));
+        inv.setItem(26, button(Material.ARROW, ChatColor.AQUA + i18n.tr("gui.common.back", "Back"),
+                List.of(ChatColor.GRAY + i18n.tr("gui.types.back_lore", "Return to builder"))));
 
         p.openInventory(inv);
     }
 
     private void typeButton(Inventory inv, int slot, FireworkEffect.Type type, BuilderSession s) {
         boolean has = s.fireworkTypes.stream().anyMatch(x -> x.equalsIgnoreCase(type.name()));
-        String status = has ? (ChatColor.GREEN + "IN TYPES") : (ChatColor.RED + "NOT IN TYPES");
+        String status = has ? (ChatColor.GREEN + i18n.tr("gui.types.in", "IN TYPES")) : (ChatColor.RED + i18n.tr("gui.types.not_in", "NOT IN TYPES"));
 
         inv.setItem(slot, button(materialFor(type),
                 ChatColor.AQUA + display(type),
                 List.of(
-                        ChatColor.GRAY + "Status: " + status,
-                        ChatColor.DARK_GRAY + "Click: add",
-                        ChatColor.DARK_GRAY + "Shift-click: remove"
+                        ChatColor.GRAY + i18n.tr("gui.types.status", "Status:") + " " + status,
+                        ChatColor.DARK_GRAY + i18n.tr("gui.types.click_add", "Click: add"),
+                        ChatColor.DARK_GRAY + i18n.tr("gui.types.shift_remove", "Shift-click: remove")
                 )));
     }
 
@@ -81,7 +84,8 @@ public class BuilderTypesMenu implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
-        if (!e.getView().getTitle().equals(TITLE)) return;
+        String title = String.format(TITLE_BASE, i18n.tr("gui.types.title", "Type Editor"));
+        if (!e.getView().getTitle().equals(title)) return;
 
         e.setCancelled(true);
 
@@ -110,16 +114,16 @@ public class BuilderTypesMenu implements Listener {
         if (shift) {
             boolean removed = s.fireworkTypes.removeIf(x -> x.equalsIgnoreCase(type.name()));
             if (removed) {
-                p.sendMessage(ChatColor.YELLOW + "Removed type: " + ChatColor.WHITE + display(type));
+                p.sendMessage(ChatColor.YELLOW + i18n.tr("msg.removed_type", "Removed type:") + " " + ChatColor.WHITE + display(type));
             } else {
-                p.sendMessage(ChatColor.GRAY + "That type is not selected.");
+                p.sendMessage(ChatColor.GRAY + i18n.tr("msg.type_not_selected", "That type is not selected."));
             }
         } else {
             if (s.fireworkTypes.stream().noneMatch(x -> x.equalsIgnoreCase(type.name()))) {
                 s.fireworkTypes.add(type.name());
-                p.sendMessage(ChatColor.GREEN + "Added type: " + ChatColor.WHITE + display(type));
+                p.sendMessage(ChatColor.GREEN + i18n.tr("msg.added_type", "Added type:") + " " + ChatColor.WHITE + display(type));
             } else {
-                p.sendMessage(ChatColor.GRAY + "Already selected: " + ChatColor.WHITE + display(type));
+                p.sendMessage(ChatColor.GRAY + i18n.tr("msg.type_already_selected", "Already selected:") + " " + ChatColor.WHITE + display(type));
             }
         }
 

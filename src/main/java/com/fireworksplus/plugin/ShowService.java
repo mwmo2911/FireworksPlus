@@ -5,6 +5,8 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.Registry;
+import org.bukkit.NamespacedKey;
 import org.bukkit.util.Vector;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,6 +22,7 @@ import java.util.*;
 public class ShowService {
 
     private final JavaPlugin plugin;
+    private final I18n i18n;
     private final Random random = new Random();
 
     private final Map<UUID, BukkitTask> activeShow = new HashMap<>();
@@ -27,17 +30,23 @@ public class ShowService {
 
     public ShowService(JavaPlugin plugin) {
         this.plugin = plugin;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
+    }
+
+    public String playBuiltIn(Player player, String showId) {
+        if (custom == null) return i18n.tr("msg.show_not_found_dot", "Show not found.");
+        if (custom.points.isEmpty()) return i18n.tr("msg.custom_no_points", "Custom show has no points.");
+
+        String policy = checkPolicy(owner);
+        if (policy != null) return policy;
+
+        BukkitTask task = runCustomPoints(custom, owner);
+        markStarted(owner, task);
+        return null;
     }
 
     public String playShow(Player player, String showId) {
-        String policy = checkPolicy(player);
-        if (policy != null) return policy;
-
-        Started started = playBuiltInAt(player.getLocation(), showId);
-        if (started == null) return "Show not found.";
-
-        markStarted(player, started.task());
-        return null;
+        return playBuiltIn(player, showId);
     }
 
     public boolean playBuiltInScheduled(Location at, String showId) {
@@ -83,7 +92,7 @@ public class ShowService {
 
             if (now - last < waitMs) {
                 long left = (waitMs - (now - last) + 999) / 1000;
-                return "Please wait " + left + "s before starting another show.";
+                return i18n.trf("msg.wait_before_start", "Please wait %ds before starting another show.", left);
             }
         }
 
@@ -94,7 +103,7 @@ public class ShowService {
                     existing.cancel();
                     activeShow.remove(player.getUniqueId());
                 } else {
-                    return "You already have a show running.";
+                    return i18n.tr("msg.already_running", "You already have a show running.");
                 }
             }
         }
@@ -313,14 +322,24 @@ public class ShowService {
         float vol = (float) plugin.getConfig().getDouble("sounds.volume", 1.0);
         float pitch = (float) plugin.getConfig().getDouble("sounds.pitch", 1.0);
 
-        Sound s;
-        try {
-            s = Sound.valueOf(soundName.toUpperCase(java.util.Locale.ROOT));
-        } catch (IllegalArgumentException ex) {
+        Sound s = findSound(soundName);
+        if (s == null) {
             return;
         }
 
         at.getWorld().playSound(at, s, vol, pitch);
+    }
+    private Sound findSound(String soundName) {
+        if (soundName == null) return null;
+        String wanted = soundName.trim();
+        if (wanted.isEmpty()) return null;
+
+        String normalized = wanted.toLowerCase(java.util.Locale.ROOT);
+        if (normalized.contains(":")) {
+            NamespacedKey key = NamespacedKey.fromString(normalized);
+            return key == null ? null : Registry.SOUNDS.get(key);
+        }
+        return Registry.SOUNDS.get(NamespacedKey.minecraft(normalized));
     }
 
     private void attachParticleTrail(Firework firework, Particle particle) {

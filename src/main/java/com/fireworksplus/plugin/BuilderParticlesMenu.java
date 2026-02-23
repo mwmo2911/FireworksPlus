@@ -20,22 +20,25 @@ import java.util.Locale;
 
 public class BuilderParticlesMenu implements Listener {
 
-    private static final String TITLE = ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Particle Editor";
+    private static final String TITLE_BASE = ChatColor.DARK_AQUA + "%s";
 
     private final JavaPlugin plugin;
     private final BuilderManager builderManager;
     private final BuilderMenu builderMenu;
+    private final I18n i18n;
 
     public BuilderParticlesMenu(JavaPlugin plugin, BuilderManager builderManager, BuilderMenu builderMenu) {
         this.plugin = plugin;
         this.builderManager = builderManager;
         this.builderMenu = builderMenu;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
     }
 
     public void open(Player p) {
         BuilderSession s = builderManager.getOrCreate(p);
 
-        Inventory inv = Bukkit.createInventory(p, 27, TITLE);
+        String title = String.format(TITLE_BASE, i18n.tr("gui.particles.title", "Particle Editor"));
+        Inventory inv = Bukkit.createInventory(p, 27, title);
         List<String> options = particleOptions();
 
         int[] slots = new int[] {1, 2, 3, 4, 5, 6, 7, 12, 13, 14};
@@ -44,22 +47,22 @@ public class BuilderParticlesMenu implements Listener {
             particleButton(inv, slots[i], options.get(i), s);
         }
 
-        inv.setItem(26, button(Material.ARROW, ChatColor.AQUA + "Back",
-                List.of(ChatColor.GRAY + "Return to builder")));
+        inv.setItem(26, button(Material.ARROW, ChatColor.AQUA + i18n.tr("gui.common.back", "Back"),
+                List.of(ChatColor.GRAY + i18n.tr("gui.particles.back_lore", "Return to builder"))));
 
         p.openInventory(inv);
     }
 
     private void particleButton(Inventory inv, int slot, String particleName, BuilderSession s) {
         boolean has = s.trailParticles.stream().anyMatch(x -> x.equalsIgnoreCase(particleName));
-        String status = has ? (ChatColor.GREEN + "IN LIST") : (ChatColor.RED + "NOT IN LIST");
+        String status = has ? (ChatColor.GREEN + i18n.tr("gui.particles.in_list", "IN LIST")) : (ChatColor.RED + i18n.tr("gui.particles.not_in_list", "NOT IN LIST"));
 
         inv.setItem(slot, button(materialForParticle(particleName),
                 ChatColor.AQUA + display(particleName),
                 List.of(
-                        ChatColor.GRAY + "Status: " + status,
-                        ChatColor.DARK_GRAY + "Click: add",
-                        ChatColor.DARK_GRAY + "Shift-click: remove"
+                        ChatColor.GRAY + i18n.tr("gui.particles.status", "Status:") + " " + status,
+                        ChatColor.DARK_GRAY + i18n.tr("gui.particles.click_add", "Click: add"),
+                        ChatColor.DARK_GRAY + i18n.tr("gui.particles.shift_remove", "Shift-click: remove")
                 )));
     }
 
@@ -77,7 +80,8 @@ public class BuilderParticlesMenu implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
-        if (!e.getView().getTitle().equals(TITLE)) return;
+        String title = String.format(TITLE_BASE, i18n.tr("gui.particles.title", "Particle Editor"));
+        if (!e.getView().getTitle().equals(title)) return;
 
         e.setCancelled(true);
 
@@ -106,17 +110,17 @@ public class BuilderParticlesMenu implements Listener {
         if (shift) {
             boolean removed = s.trailParticles.removeIf(x -> x.equalsIgnoreCase(particleName));
             if (removed) {
-                p.sendMessage(ChatColor.YELLOW + "Removed particle: " + ChatColor.WHITE + display(particleName));
+                p.sendMessage(ChatColor.YELLOW + i18n.tr("msg.removed_particle", "Removed particle:") + " " + ChatColor.WHITE + display(particleName));
             } else {
-                p.sendMessage(ChatColor.GRAY + "That particle is not selected.");
+                p.sendMessage(ChatColor.GRAY + i18n.tr("msg.particle_not_selected", "That particle is not selected."));
             }
         } else {
             if (s.trailParticles.stream().noneMatch(x -> x.equalsIgnoreCase(particleName))) {
                 s.trailParticles.add(particleName);
                 s.particleTrail = true;
-                p.sendMessage(ChatColor.GREEN + "Added particle: " + ChatColor.WHITE + display(particleName));
+                p.sendMessage(ChatColor.GREEN + i18n.tr("msg.added_particle", "Added particle:") + " " + ChatColor.WHITE + display(particleName));
             } else {
-                p.sendMessage(ChatColor.GRAY + "Already selected: " + ChatColor.WHITE + display(particleName));
+                p.sendMessage(ChatColor.GRAY + i18n.tr("msg.particle_already_selected", "Already selected:") + " " + ChatColor.WHITE + display(particleName));
             }
         }
 

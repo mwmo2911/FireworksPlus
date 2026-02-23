@@ -24,9 +24,10 @@ import java.util.List;
 
 public class BuilderMenu implements Listener {
 
-    private static final String TITLE = ChatColor.AQUA + "" + ChatColor.BOLD + "Show Builder";
 
     private final JavaPlugin plugin;
+    private final I18n i18n;
+
     private final BuilderManager builderManager;
     private final ShowStorage storage;
     private final NamespacedKey keyPointTool;
@@ -39,6 +40,7 @@ public class BuilderMenu implements Listener {
 
     public BuilderMenu(JavaPlugin plugin, BuilderManager builderManager, ShowStorage storage) {
         this.plugin = plugin;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
         this.builderManager = builderManager;
         this.storage = storage;
         this.keyPointTool = new NamespacedKey(plugin, "builder_point_tool");
@@ -71,7 +73,7 @@ public class BuilderMenu implements Listener {
     public void open(Player p) {
         BuilderSession s = builderManager.getOrCreate(p);
 
-        Inventory inv = Bukkit.createInventory(p, 27, TITLE);
+        Inventory inv = Bukkit.createInventory(p, 27, ChatColor.AQUA + i18n.tr("gui.builder.title", "Show Builder"));
 
         inv.setItem(1, button(Material.NAME_TAG,
                 ChatColor.AQUA + "Name: " + ChatColor.WHITE + s.name,
@@ -145,7 +147,8 @@ public class BuilderMenu implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
-        if (!e.getView().getTitle().equals(TITLE)) return;
+        String title = ChatColor.AQUA + i18n.tr("gui.builder.title", "Show Builder");
+        if (!e.getView().getTitle().equals(title)) return;
 
         e.setCancelled(true);
 
@@ -159,7 +162,7 @@ public class BuilderMenu implements Listener {
             if (mainMenu != null) {
                 Bukkit.getScheduler().runTask(plugin, () -> mainMenu.open(p));
             } else {
-                p.sendMessage(ChatColor.RED + "Main menu is not registered.");
+                p.sendMessage(ChatColor.RED + i18n.tr("msg.main_menu_missing", "Main menu is not registered."));
             }
             return;
         }

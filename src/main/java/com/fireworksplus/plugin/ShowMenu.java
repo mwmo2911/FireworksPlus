@@ -31,6 +31,7 @@ public class ShowMenu implements Listener {
     private final ShowService shows;
     private final ShowStorage storage;
     private final BuilderMenu builderMenu;
+    private final I18n i18n;
 
     private MainMenu mainMenu;
 
@@ -42,6 +43,7 @@ public class ShowMenu implements Listener {
         this.shows = shows;
         this.storage = storage;
         this.builderMenu = builderMenu;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
         this.keyShowId = new NamespacedKey(plugin, "show_id");
     }
 
@@ -61,7 +63,7 @@ public class ShowMenu implements Listener {
     }
 
     public void open(Player p, int page) {
-        String title = color(plugin.getConfig().getString("gui.shows.title", plugin.getConfig().getString("gui.title", "&cShows")));
+        String title = color(plugin.getConfig().getString("gui.shows.title", plugin.getConfig().getString("gui.title", i18n.tr("gui.shows.title", "&cShows"))));
         int size = clampSize(plugin.getConfig().getInt("gui.shows.size", plugin.getConfig().getInt("gui.size", 27)));
 
         Inventory inv = Bukkit.createInventory(p, size, title);
@@ -83,8 +85,8 @@ public class ShowMenu implements Listener {
         openPages.put(p.getUniqueId(), safePage);
 
         if (backSlot >= 0 && backSlot < inv.getSize()) {
-            inv.setItem(backSlot, button(Material.ARROW, ChatColor.AQUA + "Back",
-                    List.of(ChatColor.GRAY + "Return to main menu")));
+            inv.setItem(backSlot, button(Material.ARROW, ChatColor.AQUA + i18n.tr("gui.common.back", "Back"),
+                    List.of(ChatColor.GRAY + i18n.tr("gui.common.back_lore", "Return to main menu"))));
         }
 
         if (builderSlot >= 0 && builderSlot < inv.getSize()) {
@@ -92,13 +94,13 @@ public class ShowMenu implements Listener {
         }
 
         if (safePage > 0 && prevSlot < inv.getSize()) {
-            inv.setItem(prevSlot, button(Material.ARROW, ChatColor.AQUA + "Previous Page",
-                    List.of(ChatColor.GRAY + "Go to page " + safePage)));
+            inv.setItem(prevSlot, button(Material.ARROW, ChatColor.AQUA + i18n.tr("gui.shows.prev", "Previous Page"),
+                    List.of(ChatColor.GRAY + i18n.trf("gui.shows.go_to_page", "Go to page %d", safePage))));
         }
 
         if (safePage < totalPages - 1 && nextSlot < inv.getSize()) {
-            inv.setItem(nextSlot, button(Material.ARROW, ChatColor.AQUA + "Next Page",
-                    List.of(ChatColor.GRAY + "Go to page " + (safePage + 2))));
+            inv.setItem(nextSlot, button(Material.ARROW, ChatColor.AQUA + i18n.tr("gui.shows.next", "Next Page"),
+                    List.of(ChatColor.GRAY + i18n.trf("gui.shows.go_to_page", "Go to page %d", safePage + 2))));
         }
 
         int start = safePage * perPage;
@@ -117,7 +119,7 @@ public class ShowMenu implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
 
-        String title = color(plugin.getConfig().getString("gui.shows.title", plugin.getConfig().getString("gui.title", "&cShows")));
+        String title = color(plugin.getConfig().getString("gui.shows.title", plugin.getConfig().getString("gui.title", i18n.tr("gui.shows.title", "&cShows"))));
         if (!e.getView().getTitle().equals(title)) return;
 
         e.setCancelled(true);
@@ -156,7 +158,7 @@ public class ShowMenu implements Listener {
             p.closeInventory();
 
             if (!hasPermission(p, "fireworksplus.builder")) {
-                p.sendMessage(ChatColor.RED + "No permission.");
+                p.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return;
             }
 
@@ -171,28 +173,28 @@ public class ShowMenu implements Listener {
 
         if (!isBuiltIn && e.getClick() == ClickType.SHIFT_RIGHT) {
             if (!hasPermission(p, "fireworksplus.admin.delete")) {
-                p.sendMessage(ChatColor.RED + "No permission.");
+                p.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return;
             }
 
             boolean ok = storage.deleteCustomShow(showId);
             if (ok) {
-                p.sendMessage(ChatColor.GREEN + "Deleted custom show: " + ChatColor.WHITE + showId);
+                p.sendMessage(ChatColor.GREEN + i18n.tr("msg.custom_deleted", "Deleted custom show:") + " " + ChatColor.WHITE + showId);
                 open(p, page); // refresh
             } else {
-                p.sendMessage(ChatColor.RED + "Custom show not found: " + ChatColor.WHITE + showId);
+                p.sendMessage(ChatColor.RED + i18n.tr("msg.custom_not_found", "Custom show not found:") + " " + ChatColor.WHITE + showId);
             }
             return;
         }
 
         if (!isBuiltIn && e.getClick() == ClickType.RIGHT) {
             if (!hasPermission(p, "fireworksplus.builder")) {
-                p.sendMessage(ChatColor.RED + "No permission.");
+                p.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return;
             }
             DraftShow custom = storage.loadCustomShow(showId);
             if (custom == null) {
-                p.sendMessage(ChatColor.RED + "Custom show not found: " + ChatColor.WHITE + showId);
+                p.sendMessage(ChatColor.RED + i18n.tr("msg.custom_not_found", "Custom show not found:") + " " + ChatColor.WHITE + showId);
                 return;
             }
             builderMenu.openForEdit(p, custom);
@@ -200,7 +202,7 @@ public class ShowMenu implements Listener {
         }
 
         if (isBuiltIn) {
-            String err = shows.playShow(p, showId);
+            String err = shows.playBuiltIn(p, showId);
             if (err != null) p.sendMessage(ChatColor.RED + err);
         } else {
             DraftShow custom = storage.loadCustomShow(showId);
@@ -213,8 +215,8 @@ public class ShowMenu implements Listener {
         ItemStack it = new ItemStack(Material.ANVIL);
         ItemMeta meta = it.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Show Builder");
-            meta.setLore(List.of(ChatColor.GRAY + "Create a custom show via GUI"));
+            meta.setDisplayName(ChatColor.AQUA + i18n.tr("gui.builder.title", "Show Builder"));
+            meta.setLore(List.of(ChatColor.GRAY + i18n.tr("gui.shows.builder_lore", "Create a custom show via GUI")));
             it.setItemMeta(meta);
         }
         return it;
@@ -232,16 +234,16 @@ public class ShowMenu implements Listener {
 
         if (builtIn) {
             display = color(plugin.getConfig().getString("shows." + showId + ".display", "&b" + showId));
-            lore.add(ChatColor.GRAY + "Type: " + ChatColor.WHITE + "Built-in");
-            lore.add(ChatColor.GRAY + "ID: " + ChatColor.WHITE + showId);
-            lore.add(ChatColor.DARK_GRAY + "Click to play");
+            lore.add(ChatColor.GRAY + i18n.tr("gui.shows.type", "Type:") + " " + ChatColor.WHITE + i18n.tr("gui.shows.builtin", "Built-in"));
+            lore.add(ChatColor.GRAY + i18n.tr("gui.shows.id", "ID:") + " " + ChatColor.WHITE + showId);
+            lore.add(ChatColor.DARK_GRAY + i18n.tr("gui.shows.click_play", "Click to play"));
         } else {
             display = ChatColor.AQUA + showId;
-            lore.add(ChatColor.GRAY + "Type: " + ChatColor.WHITE + "Custom");
-            lore.add(ChatColor.GRAY + "ID: " + ChatColor.WHITE + showId);
-            lore.add(ChatColor.DARK_GRAY + "Click to play");
-            lore.add(ChatColor.DARK_GRAY + "Right-click: edit");
-            lore.add(ChatColor.DARK_GRAY + "Shift+Right: delete");
+            lore.add(ChatColor.GRAY + i18n.tr("gui.shows.type", "Type:") + " " + ChatColor.WHITE + i18n.tr("gui.shows.custom", "Custom"));
+            lore.add(ChatColor.GRAY + i18n.tr("gui.shows.id", "ID:") + " " + ChatColor.WHITE + showId);
+            lore.add(ChatColor.DARK_GRAY + i18n.tr("gui.shows.click_play", "Click to play"));
+            lore.add(ChatColor.DARK_GRAY + i18n.tr("gui.shows.right_edit", "Right-click: edit"));
+            lore.add(ChatColor.DARK_GRAY + i18n.tr("gui.shows.shift_delete", "Shift+Right: delete"));
         }
 
         Material mat = builtIn ? Material.FIREWORK_STAR : Material.NETHER_STAR;

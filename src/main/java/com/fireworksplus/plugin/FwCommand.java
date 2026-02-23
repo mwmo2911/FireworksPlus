@@ -20,6 +20,7 @@ public class FwCommand implements CommandExecutor {
     private final ShowStorage storage;
     private final DraftManager drafts;
     private final ScheduleManager schedule;
+    private final I18n i18n;
 
     public FwCommand(
             FireworksPlus plugin,
@@ -37,18 +38,19 @@ public class FwCommand implements CommandExecutor {
         this.storage = storage;
         this.drafts = drafts;
         this.schedule = schedule;
+        this.i18n = plugin.getI18n();
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("This command can only be used in-game.");
+            sender.sendMessage(i18n.tr("msg.command_ingame_only", "This command can only be used in-game."));
             return true;
         }
 
         if (!hasPermission(player, "fireworksplus.use")) {
-            player.sendMessage(ChatColor.RED + "No permission.");
+            player.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
             return true;
         }
 
@@ -75,14 +77,12 @@ public class FwCommand implements CommandExecutor {
 
         if ("reload".equalsIgnoreCase(sub)) {
             if (!hasPermission(player, "fireworksplus.admin.reload")) {
-                player.sendMessage(ChatColor.RED + "No permission.");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return true;
             }
 
-            plugin.reloadConfig();
-            storage.reload();
-            schedule.reload();
-            player.sendMessage(ChatColor.GREEN + "Reloaded config and data files.");
+            plugin.reloadPluginData();
+            player.sendMessage(ChatColor.GREEN + i18n.tr("msg.reload_ok", "Reloaded config and data files."));
             return true;
         }
 
@@ -101,7 +101,7 @@ public class FwCommand implements CommandExecutor {
 
         if ("edit".equalsIgnoreCase(sub)) {
             if (!hasPermission(player, "fireworksplus.builder")) {
-                player.sendMessage(ChatColor.RED + "No permission.");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return true;
             }
             if (args.length < 2) {
@@ -154,7 +154,7 @@ public class FwCommand implements CommandExecutor {
             }
 
             if (plugin.getConfig().isConfigurationSection("shows." + showId)) {
-                String reason = shows.playShow(player, showId);
+                String reason = shows.playBuiltIn(player, showId);
                 if (reason != null) {
                     player.sendMessage(ChatColor.RED + reason);
                     return true;
@@ -177,7 +177,7 @@ public class FwCommand implements CommandExecutor {
 
         if ("schedule".equalsIgnoreCase(sub)) {
             if (!hasPermission(player, "fireworksplus.admin.schedule")) {
-                player.sendMessage(ChatColor.RED + "No permission.");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return true;
             }
             if (args.length != 4) {
@@ -204,7 +204,7 @@ public class FwCommand implements CommandExecutor {
 
         if ("unschedule".equalsIgnoreCase(sub)) {
             if (!hasPermission(player, "fireworksplus.admin.schedule")) {
-                player.sendMessage(ChatColor.RED + "No permission.");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return true;
             }
             if (args.length != 2) {
@@ -223,7 +223,7 @@ public class FwCommand implements CommandExecutor {
 
         if ("schedules".equalsIgnoreCase(sub)) {
             if (!hasPermission(player, "fireworksplus.admin.schedule")) {
-                player.sendMessage(ChatColor.RED + "No permission.");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return true;
             }
 
@@ -240,7 +240,7 @@ public class FwCommand implements CommandExecutor {
 
         if ("delete".equalsIgnoreCase(sub)) {
             if (!hasPermission(player, "fireworksplus.admin.delete")) {
-                player.sendMessage(ChatColor.RED + "No permission.");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return true;
             }
 

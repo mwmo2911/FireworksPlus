@@ -20,6 +20,7 @@ public class UpdateChecker {
     public record Result(String currentVersion, String latestVersion, boolean outdated) {}
 
     private final JavaPlugin plugin;
+    private final I18n i18n;
 
     private String latestVersion;
     private long lastCheckedMs;
@@ -27,6 +28,7 @@ public class UpdateChecker {
 
     public UpdateChecker(JavaPlugin plugin) {
         this.plugin = plugin;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
     }
 
     public boolean isEnabled() {
@@ -156,9 +158,9 @@ public class UpdateChecker {
 
     private void sendUpdateMessage(Player player, Result result) {
         Bukkit.getScheduler().runTask(plugin, () -> {
-            player.sendMessage(ChatColor.GOLD + "[FireworksPlus] " + ChatColor.YELLOW + "A new version is available.");
-            player.sendMessage(ChatColor.GRAY + "Current: " + ChatColor.WHITE + result.currentVersion()
-                    + ChatColor.GRAY + " | Latest: " + ChatColor.WHITE + result.latestVersion());
+            player.sendMessage(ChatColor.GOLD + "[FireworksPlus] " + ChatColor.YELLOW + i18n.tr("msg.update_available", "A new version is available."));
+            player.sendMessage(ChatColor.GRAY + i18n.tr("msg.current", "Current:") + " " + ChatColor.WHITE + result.currentVersion()
+                    + ChatColor.GRAY + " | " + i18n.tr("msg.latest", "Latest:") + " " + ChatColor.WHITE + result.latestVersion());
         });
     }
 }

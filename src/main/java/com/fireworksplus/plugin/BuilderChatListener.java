@@ -17,6 +17,7 @@ public class BuilderChatListener implements Listener {
     private final JavaPlugin plugin;
     private final BuilderManager builderManager;
     private final BuilderMenu builderMenu;
+    private final I18n i18n;
 
     private final Set<UUID> waitingForName = new HashSet<>();
 
@@ -24,6 +25,7 @@ public class BuilderChatListener implements Listener {
         this.plugin = plugin;
         this.builderManager = builderManager;
         this.builderMenu = builderMenu;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
     }
 
     public void requestName(Player p) {
@@ -40,11 +42,11 @@ public class BuilderChatListener implements Listener {
         String msg = e.getMessage().trim();
 
         if (msg.isEmpty() || msg.length() > 24) {
-            p.sendMessage(ChatColor.RED + "Name must be 1-24 characters.");
+            p.sendMessage(ChatColor.RED + i18n.tr("msg.name_len", "Name must be 1-24 characters."));
             return;
         }
         if (!msg.matches("[A-Za-z0-9 _\\-]+")) {
-            p.sendMessage(ChatColor.RED + "Name can only contain letters, numbers, spaces, _ and -.");
+            p.sendMessage(ChatColor.RED + i18n.tr("msg.name_charset", "Name can only contain letters, numbers, spaces, _ and -."));
             return;
         }
 
@@ -53,7 +55,7 @@ public class BuilderChatListener implements Listener {
 
         waitingForName.remove(p.getUniqueId());
 
-        p.sendMessage(ChatColor.GREEN + "Builder name set to: " + ChatColor.WHITE + msg);
+        p.sendMessage(ChatColor.GREEN + i18n.tr("msg.builder_name_set", "Builder name set to:") + " " + ChatColor.WHITE + msg);
 
         Bukkit.getScheduler().runTask(plugin, () -> builderMenu.open(p));
     }

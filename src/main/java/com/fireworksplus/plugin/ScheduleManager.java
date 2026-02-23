@@ -21,6 +21,7 @@ public class ScheduleManager {
     private final JavaPlugin plugin;
     private final ShowService shows;
     private final ShowStorage storage;
+    private final I18n i18n;
 
     private final File file;
     private YamlConfiguration yaml;
@@ -31,6 +32,7 @@ public class ScheduleManager {
         this.plugin = plugin;
         this.shows = shows;
         this.storage = storage;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
 
         this.file = new File(plugin.getDataFolder(), "schedules.yml");
         reload();
@@ -63,13 +65,13 @@ public class ScheduleManager {
     }
 
     public String addSchedule(String showId, Location at, String date, String time) {
-        if (at == null || at.getWorld() == null) return "Invalid location.";
+        if (at == null || at.getWorld() == null) return i18n.tr("msg.invalid_location", "Invalid location.");
 
         LocalDateTime when;
         try {
             when = LocalDateTime.parse(date + " " + time, fmt);
         } catch (Exception e) {
-            return "Invalid datetime. Expected: yyyy-MM-dd HH:mm";
+            return i18n.tr("msg.invalid_datetime", "Invalid datetime. Expected: yyyy-MM-dd HH:mm");
         }
 
         String id = UUID.randomUUID().toString().substring(0, 8);

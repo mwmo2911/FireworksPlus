@@ -23,6 +23,7 @@ public class MainMenu implements Listener {
     private final ScheduleMenu scheduleMenu;
     private final ShowStorage storage;
     private final ScheduleManager scheduleManager;
+    private final I18n i18n;
 
     private final String title;
 
@@ -40,16 +41,16 @@ public class MainMenu implements Listener {
         this.scheduleMenu = scheduleMenu;
         this.storage = storage;
         this.scheduleManager = scheduleManager;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
 
         FileConfiguration c = plugin.getConfig();
-        this.title = color(c.getString("main_gui.title", "&cFireworksPlus"));
+        this.title = color(c.getString("main_gui.title", i18n.tr("gui.main.title", "&cFireworksPlus")));
     }
 
     public void open(Player p) {
         int size = clampSize(plugin.getConfig().getInt("main_gui.size", 27));
         Inventory inv = Bukkit.createInventory(p, size, title);
 
-        // simple filler (optional)
         Material filler = Material.GRAY_STAINED_GLASS_PANE;
         ItemStack fill = item(filler, " ", List.of());
         for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, fill);
@@ -58,26 +59,25 @@ public class MainMenu implements Listener {
         int builderSlot = plugin.getConfig().getInt("main_gui.builder_slot", 14);
 
         inv.setItem(showsSlot, item(Material.FIREWORK_STAR,
-                ChatColor.AQUA + "" + ChatColor.BOLD + "Shows",
-                List.of(ChatColor.GRAY + "Browse and start firework shows")));
+                ChatColor.AQUA + i18n.tr("gui.main.shows", "Shows"),
+                List.of(ChatColor.GRAY + i18n.tr("gui.main.shows_lore", "Browse and start firework shows"))));
 
         inv.setItem(builderSlot, item(Material.ANVIL,
-                ChatColor.AQUA + "" + ChatColor.BOLD + "Builder",
-                List.of(ChatColor.GRAY + "Create custom shows")));
+                ChatColor.AQUA + i18n.tr("gui.main.builder", "Builder"),
+                List.of(ChatColor.GRAY + i18n.tr("gui.main.builder_lore", "Create custom shows"))));
 
-        // Optional staff buttons
         if (hasPermission(p, "fireworksplus.admin.reload")) {
             int reloadSlot = plugin.getConfig().getInt("main_gui.reload_slot", 22);
             inv.setItem(reloadSlot, item(Material.REDSTONE,
-                    ChatColor.RED + "" + ChatColor.BOLD + "Reload",
-                    List.of(ChatColor.GRAY + "Reload config and data files")));
+                    ChatColor.RED + i18n.tr("gui.main.reload", "Reload"),
+                    List.of(ChatColor.GRAY + i18n.tr("gui.main.reload_lore", "Reload config and data files"))));
         }
 
         if (hasPermission(p, "fireworksplus.admin.schedule")) {
             int schedulesSlot = plugin.getConfig().getInt("main_gui.schedules_slot", 24);
             inv.setItem(schedulesSlot, item(Material.PAPER,
-                    ChatColor.AQUA + "" + ChatColor.BOLD + "Schedules",
-                    List.of(ChatColor.GRAY + "View scheduled shows")));
+                    ChatColor.AQUA + i18n.tr("gui.main.schedules", "Schedules"),
+                    List.of(ChatColor.GRAY + i18n.tr("gui.main.schedules_lore", "View scheduled shows"))));
         }
 
         p.openInventory(inv);
@@ -105,7 +105,7 @@ public class MainMenu implements Listener {
 
         if (raw == builderSlot) {
             if (!hasPermission(p, "fireworksplus.builder")) {
-                p.sendMessage(ChatColor.RED + "No permission.");
+                p.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
                 return;
             }
             builderMenu.open(p);
@@ -113,11 +113,15 @@ public class MainMenu implements Listener {
         }
 
         if (raw == reloadSlot && hasPermission(p, "fireworksplus.admin.reload")) {
-            plugin.reloadConfig();
-            storage.reload();
-            scheduleManager.reload();
-            p.sendMessage(ChatColor.GREEN + "Reloaded config and data files.");
-            open(p); // refresh
+            if (plugin instanceof FireworksPlus fp) {
+                fp.reloadPluginData();
+            } else {
+                plugin.reloadConfig();
+                storage.reload();
+                scheduleManager.reload();
+            }
+            p.sendMessage(ChatColor.GREEN + i18n.tr("msg.reload_ok", "Reloaded config and data files."));
+            open(p);
             return;
         }
 

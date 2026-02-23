@@ -6,6 +6,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class FireworksPlus extends JavaPlugin {
 
+    private I18n i18n;
+
     private ShowService showService;
     private ShowStorage showStorage;
     private DraftManager draftManager;
@@ -28,6 +30,8 @@ public class FireworksPlus extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        this.i18n = new I18n(this);
+        this.i18n.reload();
 
         this.showService = new ShowService(this);
         this.showStorage = new ShowStorage(this);
@@ -80,5 +84,18 @@ public class FireworksPlus extends JavaPlugin {
 
     public MainMenu getMainMenu() {
         return mainMenu;
+    }
+
+    public I18n getI18n() {
+        return i18n;
+    }
+
+    public void reloadPluginData() {
+        reloadConfig();
+        showStorage.reload();
+        scheduleManager.reload();
+        if (i18n != null) {
+            i18n.reload();
+        }
     }
 }

@@ -17,57 +17,60 @@ import java.util.List;
 
 public class BuilderColorsMenu implements Listener {
 
-    private static final String TITLE = ChatColor.DARK_AQUA + "" + "Palette Editor";
+    private static final String TITLE_BASE = ChatColor.DARK_AQUA + "%s";
 
     private final JavaPlugin plugin;
     private final BuilderManager builderManager;
     private final BuilderMenu builderMenu;
+    private final I18n i18n;
 
     public BuilderColorsMenu(JavaPlugin plugin, BuilderManager builderManager, BuilderMenu builderMenu) {
         this.plugin = plugin;
         this.builderManager = builderManager;
         this.builderMenu = builderMenu;
+        this.i18n = ((FireworksPlus) plugin).getI18n();
     }
 
     public void open(Player p) {
         BuilderSession s = builderManager.getOrCreate(p);
 
-        Inventory inv = Bukkit.createInventory(p, 27, TITLE);
+        String title = String.format(TITLE_BASE, i18n.tr("gui.colors.title", "Palette Editor"));
+        Inventory inv = Bukkit.createInventory(p, 27, title);
 
-        preset(inv, 10, Material.RED_DYE,        ChatColor.RED + "Red",            "#ff3333", s);
-        preset(inv, 11, Material.ORANGE_DYE,     ChatColor.GOLD + "Orange",        "#ff8800", s);
-        preset(inv, 12, Material.YELLOW_DYE,     ChatColor.YELLOW + "Yellow",      "#ffee33", s);
-        preset(inv, 13, Material.LIME_DYE,       ChatColor.GREEN + "Lime",         "#33ff66", s);
-        preset(inv, 14, Material.LIGHT_BLUE_DYE, ChatColor.AQUA + "Aqua",          "#33ccff", s);
-        preset(inv, 15, Material.BLUE_DYE,       ChatColor.BLUE + "Blue",          "#3355ff", s);
-        preset(inv, 16, Material.PURPLE_DYE,     ChatColor.DARK_PURPLE + "Purple", "#aa33ff", s);
+        preset(inv, 10, Material.RED_DYE,        ChatColor.RED + i18n.tr("gui.colors.red", "Red"),            "#ff3333", s);
+        preset(inv, 11, Material.ORANGE_DYE,     ChatColor.GOLD + i18n.tr("gui.colors.orange", "Orange"),        "#ff8800", s);
+        preset(inv, 12, Material.YELLOW_DYE,     ChatColor.YELLOW + i18n.tr("gui.colors.yellow", "Yellow"),      "#ffee33", s);
+        preset(inv, 13, Material.LIME_DYE,       ChatColor.GREEN + i18n.tr("gui.colors.lime", "Lime"),         "#33ff66", s);
+        preset(inv, 14, Material.LIGHT_BLUE_DYE, ChatColor.AQUA + i18n.tr("gui.colors.aqua", "Aqua"),          "#33ccff", s);
+        preset(inv, 15, Material.BLUE_DYE,       ChatColor.BLUE + i18n.tr("gui.colors.blue", "Blue"),          "#3355ff", s);
+        preset(inv, 16, Material.PURPLE_DYE,     ChatColor.DARK_PURPLE + i18n.tr("gui.colors.purple", "Purple"), "#aa33ff", s);
 
-        preset(inv, 3, Material.WHITE_DYE,      ChatColor.WHITE + "White",        "#ffffff", s);
-        preset(inv, 4, Material.GRAY_DYE,       ChatColor.GRAY + "Gray",          "#888888", s);
-        preset(inv, 5, Material.BLACK_DYE,      ChatColor.DARK_GRAY + "Black",    "#111111", s);
+        preset(inv, 3, Material.WHITE_DYE,      ChatColor.WHITE + i18n.tr("gui.colors.white", "White"),        "#ffffff", s);
+        preset(inv, 4, Material.GRAY_DYE,       ChatColor.GRAY + i18n.tr("gui.colors.gray", "Gray"),          "#888888", s);
+        preset(inv, 5, Material.BLACK_DYE,      ChatColor.DARK_GRAY + i18n.tr("gui.colors.black", "Black"),    "#111111", s);
 
-        inv.setItem(22, button(Material.BOOK, ChatColor.AQUA + "Current Palette",
+        inv.setItem(22, button(Material.BOOK, ChatColor.AQUA + i18n.tr("gui.colors.current", "Current Palette"),
                 List.of(
-                        ChatColor.GRAY + "Colors: " + ChatColor.WHITE + s.palette.size(),
-                        ChatColor.DARK_GRAY + "Click adds, Shift-click removes"
+                        ChatColor.GRAY + i18n.tr("gui.colors.colors", "Colors:") + " " + ChatColor.WHITE + s.palette.size(),
+                        ChatColor.DARK_GRAY + i18n.tr("gui.colors.click_hint", "Click adds, Shift-click removes")
                 )));
 
-        inv.setItem(26, button(Material.ARROW, ChatColor.AQUA + "Back",
-                List.of(ChatColor.GRAY + "Return to builder")));
+        inv.setItem(26, button(Material.ARROW, ChatColor.AQUA + i18n.tr("gui.common.back", "Back"),
+                List.of(ChatColor.GRAY + i18n.tr("gui.colors.back_lore", "Return to builder"))));
 
         p.openInventory(inv);
     }
 
     private void preset(Inventory inv, int slot, Material mat, String name, String hex, BuilderSession s) {
         boolean has = s.palette.stream().anyMatch(x -> x.equalsIgnoreCase(hex));
-        String status = has ? (ChatColor.GREEN + "IN PALETTE") : (ChatColor.RED + "NOT IN PALETTE");
+        String status = has ? (ChatColor.GREEN + i18n.tr("gui.colors.in", "IN PALETTE")) : (ChatColor.RED + i18n.tr("gui.colors.not_in", "NOT IN PALETTE"));
 
         inv.setItem(slot, button(mat, name,
                 List.of(
-                        ChatColor.GRAY + "Hex: " + ChatColor.WHITE + hex,
-                        ChatColor.GRAY + "Status: " + status,
-                        ChatColor.DARK_GRAY + "Click: add",
-                        ChatColor.DARK_GRAY + "Shift-click: remove"
+                        ChatColor.GRAY + i18n.tr("gui.colors.hex", "Hex:") + " " + ChatColor.WHITE + hex,
+                        ChatColor.GRAY + i18n.tr("gui.colors.status", "Status:") + " " + status,
+                        ChatColor.DARK_GRAY + i18n.tr("gui.colors.click_add", "Click: add"),
+                        ChatColor.DARK_GRAY + i18n.tr("gui.colors.shift_remove", "Shift-click: remove")
                 )));
     }
 
@@ -85,7 +88,8 @@ public class BuilderColorsMenu implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
-        if (!e.getView().getTitle().equals(TITLE)) return;
+        String title = String.format(TITLE_BASE, i18n.tr("gui.colors.title", "Palette Editor"));
+        if (!e.getView().getTitle().equals(title)) return;
 
         e.setCancelled(true);
 
@@ -106,7 +110,7 @@ public class BuilderColorsMenu implements Listener {
         for (String line : meta.getLore()) {
             if (line == null) continue;
             String plain = ChatColor.stripColor(line);
-            if (plain != null && plain.toLowerCase().startsWith("hex:")) {
+            if (plain != null && plain.toLowerCase().startsWith(i18n.tr("gui.colors.hex", "Hex:").toLowerCase())) {
                 hex = plain.substring(4).trim();
                 break;
             }
@@ -124,16 +128,16 @@ public class BuilderColorsMenu implements Listener {
         if (shift) {
             boolean removed = s.palette.removeIf(x -> x.equalsIgnoreCase(hexFinal));
             if (removed) {
-                p.sendMessage(ChatColor.YELLOW + "Removed color: " + ChatColor.WHITE + hexFinal);
+                p.sendMessage(ChatColor.YELLOW + i18n.tr("msg.removed_color", "Removed color:") + " " + ChatColor.WHITE + hexFinal);
             } else {
-                p.sendMessage(ChatColor.GRAY + "That color is not in your palette.");
+                p.sendMessage(ChatColor.GRAY + i18n.tr("msg.color_not_in_palette", "That color is not in your palette."));
             }
         } else {
             if (s.palette.stream().noneMatch(x -> x.equalsIgnoreCase(hexFinal))) {
                 s.palette.add(hexFinal);
-                p.sendMessage(ChatColor.GREEN + "Added color: " + ChatColor.WHITE + hexFinal);
+                p.sendMessage(ChatColor.GREEN + i18n.tr("msg.added_color", "Added color:") + " " + ChatColor.WHITE + hexFinal);
             } else {
-                p.sendMessage(ChatColor.GRAY + "Already in palette: " + ChatColor.WHITE + hexFinal);
+                p.sendMessage(ChatColor.GRAY + i18n.tr("msg.color_already_palette", "Already in palette:") + " " + ChatColor.WHITE + hexFinal);
             }
         }
         open(p);
