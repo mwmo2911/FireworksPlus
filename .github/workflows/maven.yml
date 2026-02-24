@@ -1,4 +1,4 @@
-name: Java CI
+name: Build
 
 on:
   push:
@@ -18,4 +18,4 @@ jobs:
           cache: 'maven'
 
       - name: Build
-        run: mvn -U -DskipTests package
+        run: mvn -s .github/maven-settings.xml -U -DskipTests package
