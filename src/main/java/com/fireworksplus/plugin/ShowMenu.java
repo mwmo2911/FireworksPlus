@@ -21,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -231,7 +232,8 @@ public class ShowMenu implements Listener {
         List<String> lore = new ArrayList<>();
 
         if (builtIn) {
-            display = color(plugin.getConfig().getString("shows." + showId + ".display", "&b" + showId));
+            String fallbackDisplay = plugin.getConfig().getString("shows." + showId + ".display", "&b" + showId);
+            display = color(i18n.tr(showNameKey(showId), fallbackDisplay));
             lore.add(ChatColor.GRAY + i18n.tr("gui.shows.type", "Type:") + " " + ChatColor.WHITE + i18n.tr("gui.shows.builtin", "Built-in"));
             lore.add(ChatColor.GRAY + i18n.tr("gui.shows.id", "ID:") + " " + ChatColor.WHITE + showId);
             lore.add(ChatColor.DARK_GRAY + i18n.tr("gui.shows.click_play", "Click to play"));
@@ -295,6 +297,11 @@ public class ShowMenu implements Listener {
     private String color(String s) {
         if (s == null) return "";
         return ChatColor.translateAlternateColorCodes('&', s);
+    }
+
+    private String showNameKey(String showId) {
+        String id = showId == null ? "" : showId.toLowerCase(Locale.ROOT);
+        return "gui.shows.name." + id;
     }
 
     private int clampSize(int size) {

@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 public class FwCommand implements CommandExecutor {
 
@@ -399,7 +400,8 @@ public class FwCommand implements CommandExecutor {
             return;
         }
 
-        String display = sec.getString("display", showId);
+        String fallbackDisplay = sec.getString("display", showId);
+        String display = i18n.tr(showNameKey(showId), fallbackDisplay);
         int fireworks = sec.getInt("fireworks", 30);
         int interval = sec.getInt("interval_ticks", 6);
         double radius = sec.getDouble("radius", 1.6);
@@ -479,6 +481,11 @@ public class FwCommand implements CommandExecutor {
             }
         }
         return null;
+    }
+
+    private String showNameKey(String showId) {
+        String id = showId == null ? "" : showId.toLowerCase(Locale.ROOT);
+        return "gui.shows.name." + id;
     }
 
     private String normalize(String s) {
