@@ -13,9 +13,9 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '21'
-          cache: 'maven'
+          cache: maven
 
       - name: Build
         run: mvn -s .github/maven-settings.xml -U -DskipTests package
