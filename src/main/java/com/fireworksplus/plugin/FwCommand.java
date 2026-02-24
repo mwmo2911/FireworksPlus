@@ -105,7 +105,7 @@ public class FwCommand implements CommandExecutor {
                 return true;
             }
             if (args.length < 2) {
-                player.sendMessage(ChatColor.RED + "Usage: " + ChatColor.WHITE + "/fw edit <show>");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.usage", "Usage:") + " " + ChatColor.WHITE + usageEdit());
                 return true;
             }
 
@@ -124,7 +124,7 @@ public class FwCommand implements CommandExecutor {
 
         if ("info".equalsIgnoreCase(sub)) {
             if (args.length < 2) {
-                player.sendMessage(ChatColor.RED + "Usage: " + ChatColor.WHITE + "/fw info <show>");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.usage", "Usage:") + " " + ChatColor.WHITE + usageInfo());
                 return true;
             }
 
@@ -142,7 +142,7 @@ public class FwCommand implements CommandExecutor {
         if ("play".equalsIgnoreCase(sub)) {
             if (args.length < 2) {
                 sendShowList(player);
-                player.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.WHITE + "/fw play <show>");
+                player.sendMessage(ChatColor.GRAY + i18n.tr("msg.usage", "Usage:") + " " + ChatColor.WHITE + usagePlay());
                 return true;
             }
 
@@ -181,7 +181,7 @@ public class FwCommand implements CommandExecutor {
                 return true;
             }
             if (args.length != 4) {
-                player.sendMessage(ChatColor.RED + "Usage: " + ChatColor.WHITE + "/fw schedule <show> <yyyy-MM-dd> <HH:mm>");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.usage", "Usage:") + " " + ChatColor.WHITE + usageSchedule());
                 return true;
             }
 
@@ -208,7 +208,7 @@ public class FwCommand implements CommandExecutor {
                 return true;
             }
             if (args.length != 2) {
-                player.sendMessage(ChatColor.RED + "Usage: " + ChatColor.WHITE + "/fw unschedule <id>");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.usage", "Usage:") + " " + ChatColor.WHITE + usageUnschedule());
                 return true;
             }
 
@@ -245,7 +245,7 @@ public class FwCommand implements CommandExecutor {
             }
 
             if (args.length < 2) {
-                player.sendMessage(ChatColor.RED + "Usage: " + ChatColor.WHITE + "/fw delete <show>");
+                player.sendMessage(ChatColor.RED + i18n.tr("msg.usage", "Usage:") + " " + ChatColor.WHITE + usageDelete());
                 return true;
             }
 
@@ -272,6 +272,38 @@ public class FwCommand implements CommandExecutor {
         return true;
     }
 
+    private String argShow() {
+        return "<" + i18n.tr("arg.show", "show") + ">";
+    }
+
+    private String argId() {
+        return "<" + i18n.tr("arg.id", "id") + ">";
+    }
+
+    private String usageEdit() {
+        return "/fw edit " + argShow();
+    }
+
+    private String usageInfo() {
+        return "/fw info " + argShow();
+    }
+
+    private String usagePlay() {
+        return "/fw play " + argShow();
+    }
+
+    private String usageSchedule() {
+        return "/fw schedule " + argShow() + " <" + i18n.tr("arg.date", "date") + "> <" + i18n.tr("arg.time", "time") + ">";
+    }
+
+    private String usageUnschedule() {
+        return "/fw unschedule " + argId();
+    }
+
+    private String usageDelete() {
+        return "/fw delete " + argShow();
+    }
+
     private void sendVersionBox(Player p) {
         String line1 =
                 ChatColor.GOLD + "FireworksPlus " +
@@ -289,21 +321,21 @@ public class FwCommand implements CommandExecutor {
         p.sendMessage(ChatColor.GRAY + "Commands:");
         p.sendMessage(ChatColor.YELLOW + "/fw" + ChatColor.WHITE + " - Open the GUI");
         p.sendMessage(ChatColor.YELLOW + "/fw help" + ChatColor.WHITE + " - Show this help list");
-        p.sendMessage(ChatColor.YELLOW + "/fw play <show>" + ChatColor.WHITE + " - Start a show");
-        p.sendMessage(ChatColor.YELLOW + "/fw info <show>" + ChatColor.WHITE + " - Show details for a show");
+        p.sendMessage(ChatColor.YELLOW + usagePlay() + ChatColor.WHITE + " - " + i18n.tr("help.start_show", "Start a show"));
+        p.sendMessage(ChatColor.YELLOW + usageInfo() + ChatColor.WHITE + " - " + i18n.tr("help.show_details", "Show details for a show"));
         if (hasPermission(p, "fireworksplus.builder")) {
-            p.sendMessage(ChatColor.YELLOW + "/fw edit <show>" + ChatColor.WHITE + " - Edit a custom show");
+            p.sendMessage(ChatColor.YELLOW + usageEdit() + ChatColor.WHITE + " - " + i18n.tr("help.edit_custom", "Edit a custom show"));
         }
         p.sendMessage(ChatColor.YELLOW + "/fw list" + ChatColor.WHITE + " - List all shows");
         p.sendMessage(ChatColor.YELLOW + "/fw stop" + ChatColor.WHITE + " - Stop the running show");
         p.sendMessage(ChatColor.YELLOW + "/fw version" + ChatColor.WHITE + " - Show plugin version");
         if (hasPermission(p, "fireworksplus.admin.schedule")) {
-            p.sendMessage(ChatColor.YELLOW + "/fw schedule <show> <yyyy-MM-dd> <HH:mm>" + ChatColor.WHITE + " - Schedule a show");
-            p.sendMessage(ChatColor.YELLOW + "/fw schedules" + ChatColor.WHITE + " - List schedules");
-            p.sendMessage(ChatColor.YELLOW + "/fw unschedule <id>" + ChatColor.WHITE + " - Remove a schedule");
+            p.sendMessage(ChatColor.YELLOW + usageSchedule() + ChatColor.WHITE + " - " + i18n.tr("help.schedule_show", "Schedule a show"));
+            p.sendMessage(ChatColor.YELLOW + "/fw schedules" + ChatColor.WHITE + " - " + i18n.tr("help.list_schedules", "List schedules"));
+            p.sendMessage(ChatColor.YELLOW + usageUnschedule() + ChatColor.WHITE + " - " + i18n.tr("help.remove_schedule", "Remove a schedule"));
         }
         if (hasPermission(p, "fireworksplus.admin.delete")) {
-            p.sendMessage(ChatColor.YELLOW + "/fw delete <show>" + ChatColor.WHITE + " - Delete a custom show");
+            p.sendMessage(ChatColor.YELLOW + usageDelete() + ChatColor.WHITE + " - " + i18n.tr("help.delete_custom", "Delete a custom show"));
         }
         if (hasPermission(p, "fireworksplus.admin.reload")) {
             p.sendMessage(ChatColor.YELLOW + "/fw reload" + ChatColor.WHITE + " - Reload config and data files");
@@ -347,16 +379,16 @@ public class FwCommand implements CommandExecutor {
             return;
         }
 
-        player.sendMessage(ChatColor.AQUA + "Custom show: " + ChatColor.WHITE + showId);
-        player.sendMessage(ChatColor.GRAY + "Duration: " + ChatColor.WHITE + custom.durationSeconds + "s");
-        player.sendMessage(ChatColor.GRAY + "Interval: " + ChatColor.WHITE + custom.intervalTicks + " ticks");
-        player.sendMessage(ChatColor.GRAY + "Radius: " + ChatColor.WHITE + custom.radius);
-        player.sendMessage(ChatColor.GRAY + "Power: " + ChatColor.WHITE + custom.powerMin + "-" + custom.powerMax);
-        player.sendMessage(ChatColor.GRAY + "Type: " + ChatColor.WHITE + formatTypes(custom.fireworkTypes));
-        player.sendMessage(ChatColor.GRAY + "Particles: " + ChatColor.WHITE + formatParticles(custom));
-        player.sendMessage(ChatColor.GRAY + "Points: " + ChatColor.WHITE + custom.points.size());
+        player.sendMessage(ChatColor.AQUA + i18n.tr("msg.custom_show", "Custom show") + ": " + ChatColor.WHITE + showId);
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.duration", "Duration:") + " " + ChatColor.WHITE + custom.durationSeconds + "s");
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.interval", "Interval:") + " " + ChatColor.WHITE + custom.intervalTicks + " " + i18n.tr("msg.ticks", "ticks"));
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.radius", "Radius:") + " " + ChatColor.WHITE + custom.radius);
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.power", "Power:") + " " + ChatColor.WHITE + custom.powerMin + "-" + custom.powerMax);
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.type", "Type:") + " " + ChatColor.WHITE + formatTypes(custom.fireworkTypes));
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.particles", "Particles:") + " " + ChatColor.WHITE + formatParticles(custom));
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.points", "Points:") + " " + ChatColor.WHITE + custom.points.size());
         if (!custom.palette.isEmpty()) {
-            player.sendMessage(ChatColor.GRAY + "Palette: " + ChatColor.WHITE + String.join(", ", custom.palette));
+            player.sendMessage(ChatColor.GRAY + i18n.tr("msg.palette", "Palette:") + " " + ChatColor.WHITE + String.join(", ", custom.palette));
         }
     }
 
@@ -376,31 +408,42 @@ public class FwCommand implements CommandExecutor {
         List<String> palette = sec.getStringList("palette");
         List<String> particles = sec.getStringList("particles");
 
-        player.sendMessage(ChatColor.AQUA + "Built-in show: " + ChatColor.WHITE + ChatColor.translateAlternateColorCodes('&', display));
-        player.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.WHITE + showId);
-        player.sendMessage(ChatColor.GRAY + "Fireworks: " + ChatColor.WHITE + fireworks);
-        player.sendMessage(ChatColor.GRAY + "Interval: " + ChatColor.WHITE + interval + " ticks");
-        player.sendMessage(ChatColor.GRAY + "Radius: " + ChatColor.WHITE + radius);
-        player.sendMessage(ChatColor.GRAY + "Power: " + ChatColor.WHITE + pMin + "-" + pMax);
+        player.sendMessage(ChatColor.AQUA + i18n.tr("msg.builtin_show", "Built-in show:") + " " + ChatColor.WHITE + ChatColor.translateAlternateColorCodes('&', display));
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.id", "ID:") + " " + ChatColor.WHITE + showId);
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.fireworks", "Fireworks:") + " " + ChatColor.WHITE + fireworks);
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.interval", "Interval:") + " " + ChatColor.WHITE + interval + " " + i18n.tr("msg.ticks", "ticks"));
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.radius", "Radius:") + " " + ChatColor.WHITE + radius);
+        player.sendMessage(ChatColor.GRAY + i18n.tr("msg.power", "Power:") + " " + ChatColor.WHITE + pMin + "-" + pMax);
         if (!palette.isEmpty()) {
-            player.sendMessage(ChatColor.GRAY + "Palette: " + ChatColor.WHITE + String.join(", ", palette));
+            player.sendMessage(ChatColor.GRAY + i18n.tr("msg.palette", "Palette:") + " " + ChatColor.WHITE + String.join(", ", palette));
         }
         if (particles != null && !particles.isEmpty()) {
-            player.sendMessage(ChatColor.GRAY + "Particles: " + ChatColor.WHITE + String.join(", ", particles));
+            player.sendMessage(ChatColor.GRAY + i18n.tr("msg.particles", "Particles:") + " " + ChatColor.WHITE + particles.stream().map(this::displayParticleName).collect(java.util.stream.Collectors.joining(", ")));
         }
     }
 
     private String formatTypes(List<String> types) {
-        if (types == null || types.isEmpty()) return "Random";
-        if (types.size() == 1) return types.get(0).replace("_", " ");
-        return String.join(", ", types.stream().map(t -> t.replace("_", " ")).collect(java.util.stream.Collectors.toList()));
+        if (types == null || types.isEmpty()) return i18n.tr("msg.random", "Random");
+        return String.join(", ", types.stream().map(this::displayTypeName).collect(java.util.stream.Collectors.toList()));
     }
 
     private String formatParticles(DraftShow show) {
         if (show.trailParticles != null && !show.trailParticles.isEmpty()) {
-            return String.join(", ", show.trailParticles);
+            return String.join(", ", show.trailParticles.stream().map(this::displayParticleName).collect(java.util.stream.Collectors.toList()));
         }
-        return show.particleTrail ? "On" : "Off";
+        return show.particleTrail ? i18n.tr("msg.on", "On") : i18n.tr("msg.off", "Off");
+    }
+
+    private String displayTypeName(String typeId) {
+        if (typeId == null || typeId.isBlank()) return "";
+        String key = "gui.types.name." + typeId.toLowerCase(java.util.Locale.ROOT);
+        return i18n.tr(key, typeId.replace("_", " "));
+    }
+
+    private String displayParticleName(String particleId) {
+        if (particleId == null || particleId.isBlank()) return "";
+        String key = "gui.particles.name." + particleId.toLowerCase(java.util.Locale.ROOT);
+        return i18n.tr(key, particleId.replace("_", " "));
     }
 
     private String resolveShowId(String input) {

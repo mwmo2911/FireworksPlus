@@ -63,10 +63,9 @@ public class ShowMenu implements Listener {
     }
 
     public void open(Player p, int page) {
-        String title = color(plugin.getConfig().getString("gui.shows.title", plugin.getConfig().getString("gui.title", i18n.tr("gui.shows.title", "&cShows"))));
         int size = clampSize(plugin.getConfig().getInt("gui.shows.size", plugin.getConfig().getInt("gui.size", 27)));
 
-        Inventory inv = Bukkit.createInventory(p, size, title);
+        Inventory inv = Bukkit.createInventory(p, size, showMenuTitle());
 
         int builderSlot = plugin.getConfig().getInt("gui.shows.builder_slot", plugin.getConfig().getInt("gui.builder_slot", 22));
         int backSlot = plugin.getConfig().getInt("gui.shows.back_slot", 26);
@@ -119,8 +118,7 @@ public class ShowMenu implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
 
-        String title = color(plugin.getConfig().getString("gui.shows.title", plugin.getConfig().getString("gui.title", i18n.tr("gui.shows.title", "&cShows"))));
-        if (!e.getView().getTitle().equals(title)) return;
+        if (!e.getView().getTitle().equals(showMenuTitle())) return;
 
         e.setCancelled(true);
 
@@ -281,6 +279,17 @@ public class ShowMenu implements Listener {
 
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         return pdc.get(keyShowId, PersistentDataType.STRING);
+    }
+
+    private String showMenuTitle() {
+        String configured = plugin.getConfig().getString("gui.shows.title", "");
+        if (configured == null || configured.isBlank()) {
+            configured = plugin.getConfig().getString("gui.title", "");
+        }
+        if (configured == null || configured.isBlank()) {
+            configured = i18n.tr("gui.shows.title", "&cShows");
+        }
+        return color(configured);
     }
 
     private String color(String s) {

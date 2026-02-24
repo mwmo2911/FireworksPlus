@@ -3,6 +3,7 @@ package com.fireworksplus.plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,6 +13,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -26,12 +29,14 @@ public class BuilderParticlesMenu implements Listener {
     private final BuilderManager builderManager;
     private final BuilderMenu builderMenu;
     private final I18n i18n;
+    private final NamespacedKey keyParticleId;
 
     public BuilderParticlesMenu(JavaPlugin plugin, BuilderManager builderManager, BuilderMenu builderMenu) {
         this.plugin = plugin;
         this.builderManager = builderManager;
         this.builderMenu = builderMenu;
         this.i18n = ((FireworksPlus) plugin).getI18n();
+        this.keyParticleId = new NamespacedKey(plugin, "builder_particle_id");
     }
 
     public void open(Player p) {
@@ -48,7 +53,7 @@ public class BuilderParticlesMenu implements Listener {
         }
 
         inv.setItem(26, button(Material.ARROW, ChatColor.AQUA + i18n.tr("gui.common.back", "Back"),
-                List.of(ChatColor.GRAY + i18n.tr("gui.particles.back_lore", "Return to builder"))));
+                List.of(ChatColor.GRAY + i18n.tr("gui.particles.back_lore", "Return to builder")), "__back__"));
 
         p.openInventory(inv);
     }
@@ -63,15 +68,16 @@ public class BuilderParticlesMenu implements Listener {
                         ChatColor.GRAY + i18n.tr("gui.particles.status", "Status:") + " " + status,
                         ChatColor.DARK_GRAY + i18n.tr("gui.particles.click_add", "Click: add"),
                         ChatColor.DARK_GRAY + i18n.tr("gui.particles.shift_remove", "Shift-click: remove")
-                )));
+                ), particleName));
     }
 
-    private ItemStack button(Material m, String name, List<String> lore) {
+    private ItemStack button(Material m, String name, List<String> lore, String particleId) {
         ItemStack it = new ItemStack(m);
         ItemMeta meta = it.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(name);
             meta.setLore(lore);
+            meta.getPersistentDataContainer().set(keyParticleId, PersistentDataType.STRING, particleId);
             it.setItemMeta(meta);
         }
         return it;
@@ -100,11 +106,9 @@ public class BuilderParticlesMenu implements Listener {
         ItemMeta meta = it.getItemMeta();
         if (meta == null) return;
 
-        String plain = ChatColor.stripColor(meta.getDisplayName());
-        if (plain == null) return;
-
-        String particleName = parseParticleName(plain);
-        if (particleName == null) return;
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        String particleName = pdc.get(keyParticleId, PersistentDataType.STRING);
+        if (particleName == null || particleName.isBlank() || "__back__".equals(particleName)) return;
 
         boolean shift = (e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT);
         if (shift) {
@@ -128,17 +132,10 @@ public class BuilderParticlesMenu implements Listener {
     }
 
     private String display(String particleName) {
-        return particleName.replace("_", " ");
-    }
-
-    private String parseParticleName(String label) {
-        String normalized = label.replace(" ", "_").toUpperCase(Locale.ROOT);
-        try {
-            Particle.valueOf(normalized);
-            return normalized;
-        } catch (IllegalArgumentException ignored) {
-            return null;
-        }
+        if (particleName == null || particleName.isBlank()) return "";
+        String key = "gui.particles.name." + particleName.toLowerCase(Locale.ROOT);
+        String fallback = particleName.replace("_", " ");
+        return i18n.tr(key, fallback);
     }
 
     private Material materialForParticle(String particleName) {

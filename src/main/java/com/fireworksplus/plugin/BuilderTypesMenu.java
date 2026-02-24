@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,6 +13,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -25,12 +28,14 @@ public class BuilderTypesMenu implements Listener {
     private final BuilderManager builderManager;
     private final BuilderMenu builderMenu;
     private final I18n i18n;
+    private final NamespacedKey keyTypeId;
 
     public BuilderTypesMenu(JavaPlugin plugin, BuilderManager builderManager, BuilderMenu builderMenu) {
         this.plugin = plugin;
         this.builderManager = builderManager;
         this.builderMenu = builderMenu;
         this.i18n = ((FireworksPlus) plugin).getI18n();
+        this.keyTypeId = new NamespacedKey(plugin, "builder_type_id");
     }
 
     public void open(Player p) {
@@ -49,10 +54,10 @@ public class BuilderTypesMenu implements Listener {
                 List.of(
                         ChatColor.GRAY + i18n.tr("gui.types.selected", "Selected:") + " " + ChatColor.WHITE + s.fireworkTypes.size(),
                         ChatColor.DARK_GRAY + i18n.tr("gui.types.click_hint", "Click adds, Shift-click removes")
-                )));
+                ), "__info__"));
 
         inv.setItem(26, button(Material.ARROW, ChatColor.AQUA + i18n.tr("gui.common.back", "Back"),
-                List.of(ChatColor.GRAY + i18n.tr("gui.types.back_lore", "Return to builder"))));
+                List.of(ChatColor.GRAY + i18n.tr("gui.types.back_lore", "Return to builder")), "__back__"));
 
         p.openInventory(inv);
     }
@@ -67,15 +72,16 @@ public class BuilderTypesMenu implements Listener {
                         ChatColor.GRAY + i18n.tr("gui.types.status", "Status:") + " " + status,
                         ChatColor.DARK_GRAY + i18n.tr("gui.types.click_add", "Click: add"),
                         ChatColor.DARK_GRAY + i18n.tr("gui.types.shift_remove", "Shift-click: remove")
-                )));
+                ), type.name()));
     }
 
-    private ItemStack button(Material m, String name, List<String> lore) {
+    private ItemStack button(Material m, String name, List<String> lore, String typeId) {
         ItemStack it = new ItemStack(m);
         ItemMeta meta = it.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(name);
             meta.setLore(lore);
+            meta.getPersistentDataContainer().set(keyTypeId, PersistentDataType.STRING, typeId);
             it.setItemMeta(meta);
         }
         return it;
@@ -102,11 +108,16 @@ public class BuilderTypesMenu implements Listener {
         ItemMeta meta = it.getItemMeta();
         if (meta == null) return;
 
-        String plain = ChatColor.stripColor(meta.getDisplayName());
-        if (plain == null) return;
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        String typeId = pdc.get(keyTypeId, PersistentDataType.STRING);
+        if (typeId == null || typeId.isBlank() || "__back__".equals(typeId)) return;
 
-        FireworkEffect.Type type = parseType(plain);
-        if (type == null) return;
+        FireworkEffect.Type type;
+        try {
+            type = FireworkEffect.Type.valueOf(typeId.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return;
+        }
 
         BuilderSession s = builderManager.getOrCreate(p);
         boolean shift = (e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT);
@@ -131,18 +142,10 @@ public class BuilderTypesMenu implements Listener {
     }
 
     private String display(FireworkEffect.Type type) {
-        return type.name().replace("_", " ");
+        String key = "gui.types.name." + type.name().toLowerCase(java.util.Locale.ROOT);
+        String fallback = type.name().replace("_", " ");
+        return i18n.tr(key, fallback);
     }
-
-    private FireworkEffect.Type parseType(String label) {
-        String normalized = label.replace(" ", "_").toUpperCase();
-        try {
-            return FireworkEffect.Type.valueOf(normalized);
-        } catch (IllegalArgumentException ignored) {
-            return null;
-        }
-    }
-
     private Material materialFor(FireworkEffect.Type type) {
         return switch (type) {
             case BALL -> Material.SLIME_BALL;

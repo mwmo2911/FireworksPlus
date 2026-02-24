@@ -108,7 +108,7 @@ public class BuilderMenu implements Listener {
                 List.of(ChatColor.GRAY + "Left: +0.2  |  Right: -0.2")));
 
         inv.setItem(7, button(Material.GUNPOWDER,
-                ChatColor.AQUA + "Power: " + ChatColor.WHITE + "min=" + s.powerMin + " max=" + s.powerMax,
+                ChatColor.AQUA + i18n.tr("msg.power", "Power:") + " " + ChatColor.WHITE + i18n.tr("msg.power_min_label", "min") + "=" + s.powerMin + " " + i18n.tr("msg.power_max_label", "max") + "=" + s.powerMax,
                 List.of(
                         ChatColor.GRAY + "Firework flight height",
                         ChatColor.GRAY + "Left: max +1 | Right: max -1",
@@ -366,9 +366,13 @@ public class BuilderMenu implements Listener {
     }
 
     private String displayTypes(List<String> types) {
-        if (types == null || types.isEmpty()) return "Random";
-        if (types.size() == 1) return types.get(0).replace("_", " ");
-        return "Multiple (" + types.size() + ")";
+        if (types == null || types.isEmpty()) return i18n.tr("msg.random", "Random");
+        if (types.size() == 1) {
+            String single = types.get(0);
+            String key = "gui.types.name." + single.toLowerCase(java.util.Locale.ROOT);
+            return i18n.tr(key, single.replace("_", " "));
+        }
+        return i18n.trf("msg.multiple_n", "Multiple (%d)", types.size());
     }
 
     private List<String> paletteLore(List<String> palette) {

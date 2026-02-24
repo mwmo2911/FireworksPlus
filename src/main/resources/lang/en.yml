@@ -1,3 +1,8 @@
+arg:
+  show: "show"
+  id: "id"
+  date: "date"
+  time: "time"
 msg:
   invalid_location: "Invalid location."
   invalid_datetime: "Invalid datetime. Expected: yyyy-MM-dd HH:mm"
@@ -30,8 +35,11 @@ msg:
   custom_shows: "Custom shows:"
   duration: "Duration:"
   interval: "Interval:"
+  ticks: "ticks"
   radius: "Radius:"
   power: "Power:"
+  power_min_label: "min"
+  power_max_label: "max"
   type: "Type:"
   particles: "Particles:"
   points: "Points:"
@@ -147,6 +155,16 @@ gui:
     status: "Status:"
     click_add: "Click: add"
     shift_remove: "Shift-click: remove"
+    name:
+      fireworks_spark: "Fireworks Spark"
+      end_rod: "End Rod"
+      villager_happy: "Happy Villager"
+      crit: "Critical"
+      cloud: "Cloud"
+      enchant: "Enchant"
+      drip_water: "Water Drip"
+      drip_lava: "Lava Drip"
+      heart: "Heart"
   types:
     title: "Type Editor"
     current: "Current Types"
@@ -158,6 +176,12 @@ gui:
     status: "Status:"
     click_add: "Click: add"
     shift_remove: "Shift-click: remove"
+    name:
+      ball: "Ball"
+      ball_large: "Large Ball"
+      star: "Star"
+      burst: "Burst"
+      creeper: "Creeper"
   colors:
     title: "Palette Editor"
     current: "Current Palette"
@@ -202,3 +226,8 @@ gui:
     show: "Show:"
     at: "At:"
     click_remove: "Click to remove"
+
+schedule:
+  status:
+    done_tag: "[DONE]"
+    pending_tag: "[PENDING]"

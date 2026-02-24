@@ -170,7 +170,9 @@ public class ScheduleManager {
             int y = (int) Math.round(yaml.getDouble(base + ".y"));
             int z = (int) Math.round(yaml.getDouble(base + ".z"));
 
-            String status = done ? (ChatColor.RED + "[DONE]") : (ChatColor.GREEN + "[PENDING]");
+            String doneTag = i18n.tr("schedule.status.done_tag", "[DONE]");
+            String pendingTag = i18n.tr("schedule.status.pending_tag", "[PENDING]");
+            String status = done ? (ChatColor.RED + doneTag) : (ChatColor.GREEN + pendingTag);
 
             out.add(status
                     + ChatColor.DARK_GRAY + " " + id
@@ -203,7 +205,9 @@ public class ScheduleManager {
             int y = (int) Math.round(yaml.getDouble(base + ".y"));
             int z = (int) Math.round(yaml.getDouble(base + ".z"));
 
-            String status = done ? (ChatColor.RED + "[DONE]") : (ChatColor.GREEN + "[PENDING]");
+            String doneTag = i18n.tr("schedule.status.done_tag", "[DONE]");
+            String pendingTag = i18n.tr("schedule.status.pending_tag", "[PENDING]");
+            String status = done ? (ChatColor.RED + doneTag) : (ChatColor.GREEN + pendingTag);
 
             out.add(status
                     + ChatColor.DARK_GRAY + " " + id

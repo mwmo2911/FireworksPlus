@@ -111,7 +111,8 @@ public class BuilderColorsMenu implements Listener {
             if (line == null) continue;
             String plain = ChatColor.stripColor(line);
             if (plain != null && plain.toLowerCase().startsWith(i18n.tr("gui.colors.hex", "Hex:").toLowerCase())) {
-                hex = plain.substring(4).trim();
+                int colon = plain.indexOf(':');
+                hex = colon >= 0 ? plain.substring(colon + 1).trim() : "";
                 break;
             }
         }

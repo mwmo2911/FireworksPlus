@@ -68,7 +68,7 @@ public class FwTabCompleter implements TabCompleter {
         }
 
         if (sub.equals("unschedule") && args.length == 2) {
-            return filterPrefix(scheduleIds(), args[1]);
+            return filterPrefix(collectScheduleIds(), args[1]);
         }
 
         if (sub.equals("schedule") && args.length == 3) {
@@ -98,13 +98,29 @@ public class FwTabCompleter implements TabCompleter {
         return new ArrayList<>(storage.listCustomShows());
     }
 
-    private List<String> scheduleIds() {
+    private List<String> collectScheduleIds() {
         List<String> lines = schedule.listSchedulesPretty();
         List<String> ids = new ArrayList<>();
         for (String line : lines) {
             String plain = org.bukkit.ChatColor.stripColor(line);
             String[] parts = plain.split("\\s+");
             if (parts.length >= 2) ids.add(parts[1]);
+        }
+        return ids.stream().distinct().sorted().collect(Collectors.toList());
+    }
+
+    private List<String> scheduleIds() {
+        List<String> lines = schedule.listSchedulesPretty();
+        List<String> ids = new ArrayList<>();
+        for (String line : lines) {
+            String plain = org.bukkit.ChatColor.stripColor(line);
+            String[] parts = plain.split("\\s+");
+            for (String part : parts) {
+                if (part.matches("[A-Za-z0-9]{8}")) {
+                    ids.add(part);
+                    break;
+                }
+            }
         }
         return ids;
     }

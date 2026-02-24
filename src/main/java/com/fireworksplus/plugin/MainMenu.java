@@ -44,7 +44,11 @@ public class MainMenu implements Listener {
         this.i18n = ((FireworksPlus) plugin).getI18n();
 
         FileConfiguration c = plugin.getConfig();
-        this.title = color(c.getString("main_gui.title", i18n.tr("gui.main.title", "&cFireworksPlus")));
+        String configuredTitle = c.getString("main_gui.title", "");
+        if (configuredTitle == null || configuredTitle.isBlank()) {
+            configuredTitle = i18n.tr("gui.main.title", "&cFireworksPlus");
+        }
+        this.title = color(configuredTitle);
     }
 
     public void open(Player p) {

@@ -42,7 +42,7 @@ public class ScheduleMenu implements Listener {
             p.sendMessage(ChatColor.RED + i18n.tr("msg.no_permission", "No permission."));
             return;
         }
-        String title = color(plugin.getConfig().getString("gui.schedules.title", i18n.tr("gui.schedules.title", "&bSchedules")));
+        String title = scheduleMenuTitle();
         int size = clampSize(plugin.getConfig().getInt("gui.schedules.size", 27));
 
         Inventory inv = Bukkit.createInventory(p, size, title);
@@ -77,7 +77,7 @@ public class ScheduleMenu implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
 
-        String title = color(plugin.getConfig().getString("gui.schedules.title", i18n.tr("gui.schedules.title", "&bSchedules")));
+        String title = scheduleMenuTitle();
         if (!e.getView().getTitle().equals(title)) return;
 
         e.setCancelled(true);
@@ -121,7 +121,8 @@ public class ScheduleMenu implements Listener {
 
         String header = parts.length > 0 ? parts[0].trim() : i18n.tr("gui.schedules.schedule", "Schedule");
         String scheduleId = extractScheduleId(header);
-        boolean done = header.contains("[DONE]");
+        String doneTag = i18n.tr("schedule.status.done_tag", "[DONE]");
+        boolean done = header.contains(doneTag);
         ChatColor statusColor = done ? ChatColor.RED : ChatColor.GREEN;
 
         String when = parts.length > 1 ? parts[1].trim() : "";
@@ -167,8 +168,18 @@ public class ScheduleMenu implements Listener {
     private String extractScheduleId(String header) {
         if (header == null) return null;
         String[] parts = header.trim().split("\\s+");
-        if (parts.length >= 2) return parts[1];
+        for (String part : parts) {
+            if (part.matches("[A-Za-z0-9]{8}")) return part;
+        }
         return null;
+    }
+
+    private String scheduleMenuTitle() {
+        String configured = plugin.getConfig().getString("gui.schedules.title", "");
+        if (configured == null || configured.isBlank()) {
+            configured = i18n.tr("gui.schedules.title", "&bSchedules");
+        }
+        return color(configured);
     }
 
     private String color(String s) {

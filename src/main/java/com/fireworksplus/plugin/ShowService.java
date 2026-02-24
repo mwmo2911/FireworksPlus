@@ -34,14 +34,17 @@ public class ShowService {
     }
 
     public String playBuiltIn(Player player, String showId) {
-        if (custom == null) return i18n.tr("msg.show_not_found_dot", "Show not found.");
-        if (custom.points.isEmpty()) return i18n.tr("msg.custom_no_points", "Custom show has no points.");
+        String policy = checkPolicy(player);
+        if (policy != null) {
+            return policy;
+        }
 
-        String policy = checkPolicy(owner);
-        if (policy != null) return policy;
+        Started started = playBuiltInAt(player.getLocation(), showId);
+        if (started == null) {
+            return i18n.tr("msg.show_not_found_dot", "Show not found.");
+        }
 
-        BukkitTask task = runCustomPoints(custom, owner);
-        markStarted(owner, task);
+        markStarted(player, started.task());
         return null;
     }
 
@@ -54,11 +57,17 @@ public class ShowService {
     }
 
     public String playCustom(Player owner, DraftShow custom) {
-        if (custom == null) return "Show not found.";
-        if (custom.points.isEmpty()) return "Custom show has no points.";
+        if (custom == null) {
+            return i18n.tr("msg.show_not_found_dot", "Show not found.");
+        }
+        if (custom.points.isEmpty()) {
+            return i18n.tr("msg.custom_no_points", "Custom show has no points.");
+        }
 
         String policy = checkPolicy(owner);
-        if (policy != null) return policy;
+        if (policy != null) {
+            return policy;
+        }
 
         BukkitTask task = runCustomPoints(custom, owner);
         markStarted(owner, task);
