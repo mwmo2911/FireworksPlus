@@ -30,7 +30,11 @@ public class I18n {
 
         fallback = loadLang("en");
 
-        String code = normalizeLanguage(plugin.getConfig().getString("language", "en"));
+        String configured = plugin.getConfig().getString("language", "");
+        if (configured == null || configured.isBlank()) {
+            configured = plugin.getConfig().getString("lang", "en");
+        }
+        String code = normalizeLanguage(configured);
 
         active = loadLang(code);
         if (active == null) {
