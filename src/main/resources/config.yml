@@ -26,6 +26,7 @@ main_gui:
   size: 27
   shows_slot: 12
   builder_slot: 14
+  language_icon_texture: "https://textures.minecraft.net/texture/cf40942f364f6cbceffcf1151796410286a48b1aeba77243e218026c09cd1"
   reload_slot: 22
   schedules_slot: 4
 
@@ -120,4 +121,18 @@ shows:
     radius: 1.8
     power_min: 1
     power_max: 2
-    palette: ["#FF3B30","#FF9F0A","#FFD60A","#FF2D55","#BF5AF2"]
+    palette: [ "#FF3B30","#FF9F0A","#FFD60A","#FF2D55","#BF5AF2" ]
+
+language_heads:
+  en:
+    owner: ""
+    texture: "https://textures.minecraft.net/texture/4cac9774da1217248532ce147f7831f67a12fdcca1cf0cb4b3848de6bc94b4"
+  es:
+    owner: ""
+    texture: "https://textures.minecraft.net/texture/c2d730b6dda16b584783b63d082a80049b5fa70228aba4ae884c2c1fc0c3a8bc"
+  pl:
+    owner: ""
+    texture: "https://textures.minecraft.net/texture/921b2af8d2322282fce4a1aa4f257a52b68e27eb334f4a181fd976bae6d8eb"
+  de:
+    owner: ""
+    texture: "https://textures.minecraft.net/texture/5e7899b4806858697e283f084d9173fe487886453774626b24bd8cfecc77b3f"

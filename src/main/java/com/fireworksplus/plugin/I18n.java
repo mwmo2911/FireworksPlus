@@ -69,6 +69,11 @@ public class I18n {
             return;
         }
 
+        File out = new File(langFolder, code + ".yml");
+        if (out.exists()) {
+            return;
+        }
+
         try {
             plugin.saveResource("lang/" + code + ".yml", false);
         } catch (IllegalArgumentException ignored) {

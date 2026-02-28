@@ -22,6 +22,7 @@ public class FireworksPlus extends JavaPlugin {
 
     private MainMenu mainMenu;
     private ScheduleMenu scheduleMenu;
+    private LanguageMenu languageMenu;
 
     private BuilderManager builderManager;
     private BuilderChatListener builderChatListener;
@@ -30,6 +31,7 @@ public class FireworksPlus extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        applyConfigDefaults();
         this.i18n = new I18n(this);
         this.i18n.reload();
 
@@ -53,13 +55,15 @@ public class FireworksPlus extends JavaPlugin {
 
         this.showMenu = new ShowMenu(this, showService, showStorage, builderMenu);
         this.scheduleMenu = new ScheduleMenu(this, scheduleManager);
-        this.mainMenu = new MainMenu(this, showMenu, builderMenu, scheduleMenu, showStorage, scheduleManager);
+        this.languageMenu = new LanguageMenu(this);
+        this.mainMenu = new MainMenu(this, showMenu, builderMenu, scheduleMenu, languageMenu, showStorage, scheduleManager);
         this.updateChecker = new UpdateChecker(this);
         this.updateListener = new UpdateListener(updateChecker);
 
         showMenu.setMainMenu(mainMenu);
         builderMenu.setMainMenu(mainMenu);
         scheduleMenu.setMainMenu(mainMenu);
+        languageMenu.setMainMenu(mainMenu);
 
         Bukkit.getPluginManager().registerEvents(mainMenu, this);
         Bukkit.getPluginManager().registerEvents(showMenu, this);
@@ -67,6 +71,7 @@ public class FireworksPlus extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(builderTypesMenu, this);
         Bukkit.getPluginManager().registerEvents(builderParticlesMenu, this);
         Bukkit.getPluginManager().registerEvents(scheduleMenu, this);
+        Bukkit.getPluginManager().registerEvents(languageMenu, this);
         Bukkit.getPluginManager().registerEvents(builderColorsMenu, this);
         Bukkit.getPluginManager().registerEvents(builderChatListener, this);
         Bukkit.getPluginManager().registerEvents(updateListener, this);
@@ -80,6 +85,41 @@ public class FireworksPlus extends JavaPlugin {
         scheduleManager.startPolling();
         updateChecker.notifyOnlineAdminsIfOutdated();
         getLogger().info("FireworksPlus enabled.");
+    }
+
+    private void applyConfigDefaults() {
+        boolean changed = false;
+
+        if (!getConfig().isSet("main_gui.language_slot")) {
+            getConfig().set("main_gui.language_slot", 13);
+            changed = true;
+        }
+
+        if (!getConfig().isSet("main_gui.language_icon_texture")) {
+            getConfig().set("main_gui.language_icon_texture", "https://textures.minecraft.net/texture/cf40942f364f6cbceffcf1151796410286a48b1aeba77243e218026c09cd1");
+            changed = true;
+        }
+
+        changed |= ensureLanguageHeadDefaults("en");
+        changed |= ensureLanguageHeadDefaults("es");
+        changed |= ensureLanguageHeadDefaults("pl");
+        changed |= ensureLanguageHeadDefaults("de");
+
+        if (changed) {
+            saveConfig();
+        }
+    }
+
+    private boolean ensureLanguageHeadDefaults(String code) {
+        boolean changed = false;
+        String base = "language_heads." + code;
+
+        if (!getConfig().isSet(base + ".texture")) {
+            getConfig().set(base + ".texture", "");
+            changed = true;
+        }
+
+        return changed;
     }
 
     public MainMenu getMainMenu() {
